@@ -116,10 +116,25 @@ export default class Toolbar extends Component {
   }
 
   componentDidUpdate() {
-    if (!this.props.editorState.getSelection().isCollapsed()) {
+    const isDescendant = function(parent, child) {
+       var node = child.parentNode;
+       while (node != null) {
+           if (node == parent) {
+               return true;
+           }
+           node = node.parentNode;
+       }
+       return false;
+    };
+
+    const selection = window.getSelection();
+    if (selection.rangeCount !== 0 && 
+        selection.getRangeAt(0) && 
+        !selection.isCollapsed &&
+        isDescendant(this.props.editor, selection.getRangeAt(0).commonAncestorContainer)) {
       return this.setBarPosition();
     } else {
-      if (this.state.show) {
+      if (this.state.show && !this.state.editingEntity) {
         this.setState({
           show: false,
           editingEntity: null,
